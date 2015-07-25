@@ -4,6 +4,9 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use App\Models\Post;
+
+use Carbon\Carbon;
 
 class PostController extends Controller {
 
@@ -12,10 +15,25 @@ class PostController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Post $postModel)
 	{
-         return view('post.index');
+        //$posts = Post::all();
+        //$posts = Post::latest('id')->get();
+        //$posts = Post::latest('published_at')->get();
+        //$posts = Post::latest('published_at')
+            //->where('published_at', '<=', Carbon::now())
+            //->get();
+
+        $posts = $postModel->getPublishedPosts();
+
+        return view('post.index', ['posts' => $posts]);
 	}
+
+    public function unpublished(Post $postModel)
+    {
+        $posts = $postModel->getUnPublishedPosts();
+        return view('post.index', ['posts' => $posts]);
+    }
 
 	/**
 	 * Show the form for creating a new resource.
@@ -24,7 +42,7 @@ class PostController extends Controller {
 	 */
 	public function create()
 	{
-		//
+		return view('post.create');
 	}
 
 	/**
@@ -32,9 +50,11 @@ class PostController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Post $postModel, request $request)
 	{
-		//
+        //dd($request->all());
+		$postModel->create($request->all());
+        return redirect()->route('posts');
 	}
 
 	/**
